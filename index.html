@@ -363,15 +363,16 @@ let serverCounts = { "13/06/2027": 0, "20/06/2027": 0, "27/06/2027": 0 };
 window.addEventListener('load', () => { loadCounts(); assignGroupName(); });
 
 async function assignGroupName() {
-  // Fetch current count from server to determine next group number
   let nextNum = 1;
   try {
-    const res = await fetch(SCRIPT_URL + '?action=count', { method: 'GET' });
+    const res = await fetch(SCRIPT_URL, { method: 'GET' });
     const data = await res.json();
-    nextNum = (data.total || 0) + 1;
+    // total = somme des inscrits sur les 3 dates
+    const counts = data.counts || {};
+    const total = (counts["13/06/2027"] || 0) + (counts["20/06/2027"] || 0) + (counts["27/06/2027"] || 0);
+    nextNum = total + 1;
   } catch(e) {
-    // fallback: use timestamp-based local number
-    nextNum = Math.floor(Date.now() / 1000) % 1000 || 1;
+    nextNum = 1;
   }
   document.getElementById('nom_groupe').value = 'Groupe ' + nextNum;
 }
